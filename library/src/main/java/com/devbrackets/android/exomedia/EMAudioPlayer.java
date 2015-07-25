@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
+import com.devbrackets.android.exomedia.builder.DashRendererBuilder;
 import com.devbrackets.android.exomedia.builder.HlsRenderBuilder;
 import com.devbrackets.android.exomedia.builder.RenderBuilder;
 import com.devbrackets.android.exomedia.event.EMMediaProgressEvent;
@@ -52,13 +53,16 @@ public class EMAudioPlayer implements AudioCapabilitiesReceiver.Listener {
 
     public enum AudioType {
         HLS,
+        DASH,
         DEFAULT;
 
         public static AudioType get(Uri uri) {
             if (uri.toString().matches(".*\\.m3u8.*")) {
                 return AudioType.HLS;
             }
-
+            if (uri.toString().contains("/api/manifest/dash/")){
+                return AudioType.DASH;
+            }
             return AudioType.DEFAULT;
         }
     }
@@ -222,6 +226,8 @@ public class EMAudioPlayer implements AudioCapabilitiesReceiver.Listener {
         switch (renderType) {
             case HLS:
                 return new HlsRenderBuilder(context, getUserAgent(), uri.toString(), audioCapabilities);
+            case DASH:
+                return new DashRendererBuilder(context, getUserAgent(), uri.toString(), audioCapabilities);
             default:
                 return new RenderBuilder(context, getUserAgent(), uri.toString(), defaultMediaType);
         }
