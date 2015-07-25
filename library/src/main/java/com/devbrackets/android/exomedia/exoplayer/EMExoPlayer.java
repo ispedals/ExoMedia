@@ -39,11 +39,13 @@ import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.TimeRange;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.chunk.ChunkSampleSource;
 import com.google.android.exoplayer.chunk.Format;
 import com.google.android.exoplayer.chunk.MultiTrackChunkSource;
+import com.google.android.exoplayer.dash.DashChunkSource;
 import com.google.android.exoplayer.drm.StreamingDrmSessionManager;
 import com.google.android.exoplayer.hls.HlsSampleSource;
 import com.google.android.exoplayer.metadata.MetadataTrackRenderer;
@@ -58,7 +60,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EMExoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener, DefaultBandwidthMeter.EventListener, HlsSampleSource.EventListener,
-        MediaCodecVideoTrackRenderer.EventListener, TextRenderer, MediaCodecAudioTrackRenderer.EventListener, StreamingDrmSessionManager.EventListener {
+        MediaCodecVideoTrackRenderer.EventListener, DashChunkSource.EventListener, TextRenderer, MediaCodecAudioTrackRenderer.EventListener, StreamingDrmSessionManager.EventListener {
 
     public static final int DISABLED_TRACK = -1;
     public static final int PRIMARY_TRACK = 0;
@@ -367,6 +369,13 @@ public class EMExoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventL
         wakeLock.setReferenceCounted(false);
         if (wasHeld) {
             wakeLock.acquire();
+        }
+    }
+
+    @Override
+    public void onSeekRangeChanged(TimeRange seekRange) {
+        if (infoListener != null) {
+            infoListener.onSeekRangeChanged(seekRange);
         }
     }
 
